@@ -13,6 +13,9 @@ import com.afollestad.assent.GrantResult
 import com.afollestad.assent.Permission
 import com.afollestad.assent.askForPermissions
 import com.afollestad.assent.isAllGranted
+import com.budiyev.android.codescanner.CodeScanner
+import com.budiyev.android.codescanner.DecodeCallback
+import com.budiyev.android.codescanner.ScanMode
 import com.manishjandu.coinvalidator.R
 import com.manishjandu.coinvalidator.databinding.FragmentQrscannerBinding
 
@@ -22,6 +25,7 @@ class QrScannerFragment : Fragment(R.layout.fragment_qrscanner) {
     private var _binding: FragmentQrscannerBinding? = null
     private val binding get() = _binding!!
     private val args: QrScannerFragmentArgs by navArgs()
+    private lateinit var codeScanner: CodeScanner
 
     override fun onStart() {
         super.onStart()
@@ -45,6 +49,7 @@ class QrScannerFragment : Fragment(R.layout.fragment_qrscanner) {
     }
 
     private fun moveToSettingsScreens() {
+        //reference: https://stackoverflow.com/questions/32898901/go-to-my-apps-app-permission-screen
         val intent = Intent(
             Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
             Uri.fromParts("package", "com.manishjandu.coinvalidator", null)
@@ -53,10 +58,28 @@ class QrScannerFragment : Fragment(R.layout.fragment_qrscanner) {
         startActivity(intent)
     }
 
+    private fun setupQrScanner() {
+        val scannerView = binding.scanner
+        codeScanner = CodeScanner(requireContext(), scannerView)
+        codeScanner.scanMode = ScanMode.CONTINUOUS
+        codeScanner.decodeCallback = DecodeCallback {
+            requireActivity().runOnUiThread {
+                setCryptoAddress(it.text)
+            }
+        }
+        scannerView.setOnClickListener {
+            codeScanner.startPreview()
+        }
+    }
+
+    private fun setCryptoAddress(address: String) {
+        binding.textViewAddress.text = address
+    }
+
     private fun checkAndSetCameraPermission() {
         if (hasCameraPermission()) {
-            //Todo:camera permission success
             setViewHasCameraPermission()
+            setupQrScanner()
         } else {
             setViewNoCameraPermission()
             setCameraPermission()
@@ -73,6 +96,7 @@ class QrScannerFragment : Fragment(R.layout.fragment_qrscanner) {
                 result[Permission.CAMERA] == GrantResult.GRANTED -> {
                     //Todo:camera permission success
                     setViewHasCameraPermission()
+                    setupQrScanner()
                 }
                 result[Permission.CAMERA] == GrantResult.DENIED -> {
                     AlertDialog.Builder(requireContext())
@@ -85,24 +109,37 @@ class QrScannerFragment : Fragment(R.layout.fragment_qrscanner) {
                         .show()
                 }
                 else -> {
-                    //Todo:Permanently denied
                     setViewNoCameraPermission()
                 }
             }
         }
     }
 
-    private fun setViewNoCameraPermission(){
+    private fun setViewNoCameraPermission() {
         binding.apply {
             groupHasCameraPermission.visibility = View.GONE
             groupNoCameraPermission.visibility = View.VISIBLE
         }
     }
 
-    private fun setViewHasCameraPermission(){
+    private fun setViewHasCameraPermission() {
         binding.apply {
             groupHasCameraPermission.visibility = View.VISIBLE
             groupNoCameraPermission.visibility = View.GONE
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (::codeScanner.isInitialized) {
+            codeScanner.startPreview()
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        if (::codeScanner.isInitialized) {
+            codeScanner.releaseResources()
         }
     }
 
