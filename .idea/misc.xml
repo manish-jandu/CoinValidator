@@ -4,6 +4,8 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Projects/Android-Projects/CoinValidator/app/src/main/res/layout/activity_main.xml" value="0.17083333333333334" />
+        <entry key="..\:/Projects/Android-Projects/CoinValidator/app/src/main/res/layout/fragment_home.xml" value="0.13703703703703704" />
+        <entry key="..\:/Projects/Android-Projects/CoinValidator/app/src/main/res/layout/fragment_qrscanner.xml" value="0.13703703703703704" />
       </map>
     </option>
   </component>
