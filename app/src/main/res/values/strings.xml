@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">Coin Validator</string>
+    <string name="btc">BTC</string>
+    <string name="eth">ETH</string>
+    <string name="square_border_background">Square Border Background</string>
+    <string name="image_cryptocurrency">Image representing cryptocurrency</string>
+    <string name="your">Your</string>
+    <string name="coin">Coin</string>
+    <string name="validator">Validator</string>
 </resources>
