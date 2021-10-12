@@ -6,3 +6,8 @@ import com.manishjandu.coinvalidator.R
 
 class QrScannerFragment:Fragment(R.layout.fragment_qrscanner) {
 }
+
+enum class CryptoType{
+    Bitcoin,
+    Ethereum
+}

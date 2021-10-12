@@ -18,5 +18,10 @@
         android:id="@+id/qrScannerFragment"
         android:name="com.manishjandu.coinvalidator.ui.QrScannerFragment"
         android:label="Qr Scanner"
-        tools:layout="@layout/fragment_qrscanner" />
+        tools:layout="@layout/fragment_qrscanner">
+        <argument
+            android:name="cryptoType"
+            android:defaultValue="Bitcoin"
+            app:argType="com.manishjandu.coinvalidator.ui.CryptoType"/>
+    </fragment>
 </navigation>
