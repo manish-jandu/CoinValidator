@@ -7,4 +7,9 @@
     <string name="your">Your</string>
     <string name="coin">Coin</string>
     <string name="validator">Validator</string>
+    <string name="share">Share</string>
+    <string name="validate">Validate</string>
+    <string name="qr_code_scanner">Qr code Scanner.</string>
+    <string name="error_text_camera_permission">Access to Camera is required to scan Qr code. So kindly move to settings screen and give permission for Camera.</string>
+    <string name="move_to_setting">Move to Setting</string>
 </resources>

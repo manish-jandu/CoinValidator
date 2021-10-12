@@ -4,17 +4,104 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.QrScannerFragment"
-    >
+    tools:context=".ui.QrScannerFragment">
 
-    <TextView
-        android:id="@+id/textView2"
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/group_has_camera_permission"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="QrScanner Fragment"
+        android:visibility="visible"
+        app:constraint_referenced_ids="scanner,text_view_address,button_address_validator,button_share,text_view_address_is_valid" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/group_no_camera_permission"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:constraint_referenced_ids="text_view_camera_permission,button_setting_camera_access" />
+
+    <ImageView
+        android:id="@+id/scanner"
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:contentDescription="@string/qr_code_scanner"
+        android:src="@color/black"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.3" />
+
+    <TextView
+        android:id="@+id/text_view_address"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:gravity="center"
+        android:text=""
+        android:textColor="@color/mediumGray"
+        app:layout_constraintEnd_toEndOf="@+id/scanner"
+        app:layout_constraintStart_toStartOf="@+id/scanner"
+        app:layout_constraintTop_toBottomOf="@+id/scanner" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/button_address_validator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="50dp"
+        android:text="@string/validate"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/button_share"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/button_share"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/share"
+        app:layout_constraintBottom_toBottomOf="@+id/button_address_validator"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/button_address_validator" />
+
+    <TextView
+        android:id="@+id/text_view_address_is_valid"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:gravity="center"
+        android:text=""
+        android:textColor="@color/mediumGray"
+        app:layout_constraintEnd_toEndOf="@+id/button_share"
+        app:layout_constraintStart_toStartOf="@+id/button_address_validator"
+        app:layout_constraintTop_toBottomOf="@+id/button_address_validator" />
+
+    <TextView
+        android:id="@+id/text_view_camera_permission"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
+        android:text="@string/error_text_camera_permission"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.36" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/button_setting_camera_access"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="@string/move_to_setting"
+        app:layout_constraintEnd_toEndOf="@+id/text_view_camera_permission"
+        app:layout_constraintStart_toStartOf="@+id/text_view_camera_permission"
+        app:layout_constraintTop_toBottomOf="@+id/text_view_camera_permission" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
