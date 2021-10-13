@@ -7,6 +7,8 @@ import com.manishjandu.coinvalidator.ui.CryptoType
 import com.manishjandu.coinvalidator.utils.IsCryptoAddressValid
 
 class QrScannerViewModel : ViewModel() {
+    private val _isScannerSet = MutableLiveData<Boolean>()
+    val isScannerSet: LiveData<Boolean> = _isScannerSet
 
     private val _cryptoAddress = MutableLiveData<String>()
     val cryptoAddress: LiveData<String> = _cryptoAddress
@@ -16,6 +18,10 @@ class QrScannerViewModel : ViewModel() {
 
     fun setCryptoAddress(address: String) {
         _cryptoAddress.value = address
+    }
+
+    fun setScanner(isSet: Boolean) {
+        _isScannerSet.value = isSet
     }
 
     fun validateCryptoAddress(cryptoType: CryptoType, cryptoAddress: String) {

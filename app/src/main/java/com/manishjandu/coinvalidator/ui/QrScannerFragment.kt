@@ -35,6 +35,7 @@ class QrScannerFragment : Fragment(R.layout.fragment_qrscanner) {
     private lateinit var cryptoType: CryptoType
     private var cryptoAddress: String? = null
     private var isCryptoValid: IsCryptoAddressValid? = null
+    private var isScannerSet = false
 
     override fun onStart() {
         super.onStart()
@@ -47,6 +48,7 @@ class QrScannerFragment : Fragment(R.layout.fragment_qrscanner) {
         cryptoType = args.cryptoType
 
         setupButtons()
+        setupQrScannerObserver()
         setupCryptoAddressObserver()
         setupValidCryptoObserver()
     }
@@ -63,6 +65,15 @@ class QrScannerFragment : Fragment(R.layout.fragment_qrscanner) {
             }
             binding.buttonShare.setOnClickListener {
                 shareCryptoAddress()
+            }
+        }
+    }
+
+
+    private fun setupQrScannerObserver() {
+        viewModel.isScannerSet.observe(viewLifecycleOwner){
+            it?.let {
+                isScannerSet = true
             }
         }
     }
@@ -139,6 +150,7 @@ class QrScannerFragment : Fragment(R.layout.fragment_qrscanner) {
         scannerView.setOnClickListener {
             codeScanner.startPreview()
         }
+        viewModel.setScanner(true)
     }
 
     private fun setCryptoAddress(address: String) {
@@ -152,7 +164,9 @@ class QrScannerFragment : Fragment(R.layout.fragment_qrscanner) {
     private fun checkAndSetCameraPermission() {
         if (hasCameraPermission()) {
             setViewHasCameraPermission()
-            setupQrScanner()
+            if(!isScannerSet){
+                setupQrScanner()
+            }
         } else {
             setViewNoCameraPermission()
             setCameraPermission()
