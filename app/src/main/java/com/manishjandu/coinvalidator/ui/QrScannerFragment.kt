@@ -7,6 +7,7 @@ import android.provider.Settings
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.afollestad.assent.GrantResult
@@ -18,6 +19,7 @@ import com.budiyev.android.codescanner.DecodeCallback
 import com.budiyev.android.codescanner.ScanMode
 import com.manishjandu.coinvalidator.R
 import com.manishjandu.coinvalidator.databinding.FragmentQrscannerBinding
+import com.manishjandu.coinvalidator.viewmodels.QrScannerViewModel
 
 private const val TAG = "QrScannerFragment"
 
@@ -25,7 +27,10 @@ class QrScannerFragment : Fragment(R.layout.fragment_qrscanner) {
     private var _binding: FragmentQrscannerBinding? = null
     private val binding get() = _binding!!
     private val args: QrScannerFragmentArgs by navArgs()
+    private val viewModel: QrScannerViewModel by viewModels()
     private lateinit var codeScanner: CodeScanner
+    private lateinit var cryptoType: CryptoType
+    private lateinit var cryptoAddress: String
 
     override fun onStart() {
         super.onStart()
@@ -35,15 +40,28 @@ class QrScannerFragment : Fragment(R.layout.fragment_qrscanner) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentQrscannerBinding.bind(view)
+        cryptoType = args.cryptoType
 
-        val cryptoType = args.cryptoType
         setupButtons()
+        setupCryptoAddressObserver()
     }
 
     private fun setupButtons() {
         binding.apply {
             buttonSettingCameraAccess.setOnClickListener {
                 moveToSettingsScreens()
+            }
+            binding.buttonAddressValidator.setOnClickListener {
+
+            }
+        }
+    }
+
+    private fun setupCryptoAddressObserver() {
+        viewModel.cryptoAddress.observe(viewLifecycleOwner) {
+            it?.let {
+                binding.textViewAddress.text = it
+                cryptoAddress = it
             }
         }
     }
@@ -59,6 +77,7 @@ class QrScannerFragment : Fragment(R.layout.fragment_qrscanner) {
     }
 
     private fun setupQrScanner() {
+        //reference: https://github.com/yuriy-budiyev/code-scanner
         val scannerView = binding.scanner
         codeScanner = CodeScanner(requireContext(), scannerView)
         codeScanner.scanMode = ScanMode.CONTINUOUS
@@ -73,7 +92,7 @@ class QrScannerFragment : Fragment(R.layout.fragment_qrscanner) {
     }
 
     private fun setCryptoAddress(address: String) {
-        binding.textViewAddress.text = address
+        viewModel.setCryptoAddress(address)
     }
 
     private fun checkAndSetCameraPermission() {
@@ -94,7 +113,6 @@ class QrScannerFragment : Fragment(R.layout.fragment_qrscanner) {
         askForPermissions(Permission.CAMERA) { result ->
             when {
                 result[Permission.CAMERA] == GrantResult.GRANTED -> {
-                    //Todo:camera permission success
                     setViewHasCameraPermission()
                     setupQrScanner()
                 }
