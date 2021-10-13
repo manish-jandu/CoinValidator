@@ -17,8 +17,11 @@ import com.afollestad.assent.isAllGranted
 import com.budiyev.android.codescanner.CodeScanner
 import com.budiyev.android.codescanner.DecodeCallback
 import com.budiyev.android.codescanner.ScanMode
+import com.google.android.material.snackbar.Snackbar
 import com.manishjandu.coinvalidator.R
 import com.manishjandu.coinvalidator.databinding.FragmentQrscannerBinding
+import com.manishjandu.coinvalidator.utils.IsCryptoAddressValid
+import com.manishjandu.coinvalidator.utils.IsCryptoAddressValid.Valid
 import com.manishjandu.coinvalidator.viewmodels.QrScannerViewModel
 
 private const val TAG = "QrScannerFragment"
@@ -30,7 +33,8 @@ class QrScannerFragment : Fragment(R.layout.fragment_qrscanner) {
     private val viewModel: QrScannerViewModel by viewModels()
     private lateinit var codeScanner: CodeScanner
     private lateinit var cryptoType: CryptoType
-    private lateinit var cryptoAddress: String
+    private var cryptoAddress: String? = null
+    private var isCryptoValid: IsCryptoAddressValid? = null
 
     override fun onStart() {
         super.onStart()
@@ -44,6 +48,7 @@ class QrScannerFragment : Fragment(R.layout.fragment_qrscanner) {
 
         setupButtons()
         setupCryptoAddressObserver()
+        setupValidCryptoObserver()
     }
 
     private fun setupButtons() {
@@ -52,7 +57,12 @@ class QrScannerFragment : Fragment(R.layout.fragment_qrscanner) {
                 moveToSettingsScreens()
             }
             binding.buttonAddressValidator.setOnClickListener {
-
+                if (!cryptoAddress.isNullOrEmpty() && ::cryptoType.isInitialized) {
+                    viewModel.validateCryptoAddress(cryptoType, cryptoAddress!!)
+                }
+            }
+            binding.buttonShare.setOnClickListener {
+                shareCryptoAddress()
             }
         }
     }
@@ -60,10 +70,50 @@ class QrScannerFragment : Fragment(R.layout.fragment_qrscanner) {
     private fun setupCryptoAddressObserver() {
         viewModel.cryptoAddress.observe(viewLifecycleOwner) {
             it?.let {
-                binding.textViewAddress.text = it
-                cryptoAddress = it
+                if (it != cryptoAddress) {
+                    binding.apply {
+                        textViewAddress.text = it
+                        textViewAddressIsValid.text = ""
+                    }
+                    cryptoAddress = it
+                    isCryptoValid = null
+                    //Todo:vibratePhone()
+                }
             }
         }
+    }
+
+    private fun setupValidCryptoObserver() {
+        viewModel.isAddressValid.observe(viewLifecycleOwner) {
+            it?.let {
+                isCryptoValid = it
+                if (it is Valid) {
+                    binding.textViewAddressIsValid.text = "Address is valid"
+                } else {
+                    binding.textViewAddressIsValid.text = "Address is Invalid"
+
+                }
+            }
+        }
+    }
+
+    private fun shareCryptoAddress() {
+        if (isCryptoValid != null) {
+            if (isCryptoValid is Valid) {
+                shareTextWithOtherApps(cryptoAddress!!)
+            } else {
+                showErrorSnackBar("Cannot share, address not valid.")
+            }
+        } else {
+            showErrorSnackBar("Validate address then share.")
+        }
+    }
+
+    private fun shareTextWithOtherApps(text: String) {
+        val intent = Intent(Intent.ACTION_SEND)
+        intent.putExtra(Intent.EXTRA_TEXT, text)
+        intent.type = "text/plain"
+        startActivity(intent)
     }
 
     private fun moveToSettingsScreens() {
@@ -93,6 +143,10 @@ class QrScannerFragment : Fragment(R.layout.fragment_qrscanner) {
 
     private fun setCryptoAddress(address: String) {
         viewModel.setCryptoAddress(address)
+    }
+
+    private fun showErrorSnackBar(message: String) {
+        Snackbar.make(requireView(), message, Snackbar.LENGTH_SHORT).show()
     }
 
     private fun checkAndSetCameraPermission() {
