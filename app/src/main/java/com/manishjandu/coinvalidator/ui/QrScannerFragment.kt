@@ -1,8 +1,10 @@
 package com.manishjandu.coinvalidator.ui
 
+import android.content.Context
+import android.content.Context.VIBRATOR_SERVICE
 import android.content.Intent
 import android.net.Uri
-import android.os.Bundle
+import android.os.*
 import android.provider.Settings
 import android.view.View
 import androidx.appcompat.app.AlertDialog
@@ -71,7 +73,7 @@ class QrScannerFragment : Fragment(R.layout.fragment_qrscanner) {
 
 
     private fun setupQrScannerObserver() {
-        viewModel.isScannerSet.observe(viewLifecycleOwner){
+        viewModel.isScannerSet.observe(viewLifecycleOwner) {
             it?.let {
                 isScannerSet = true
             }
@@ -88,7 +90,7 @@ class QrScannerFragment : Fragment(R.layout.fragment_qrscanner) {
                     }
                     cryptoAddress = it
                     isCryptoValid = null
-                    //Todo:vibratePhone()
+                    vibratePhone()
                 }
             }
         }
@@ -102,7 +104,6 @@ class QrScannerFragment : Fragment(R.layout.fragment_qrscanner) {
                     binding.textViewAddressIsValid.text = "Address is valid"
                 } else {
                     binding.textViewAddressIsValid.text = "Address is Invalid"
-
                 }
             }
         }
@@ -164,7 +165,7 @@ class QrScannerFragment : Fragment(R.layout.fragment_qrscanner) {
     private fun checkAndSetCameraPermission() {
         if (hasCameraPermission()) {
             setViewHasCameraPermission()
-            if(!isScannerSet){
+            if (!isScannerSet) {
                 setupQrScanner()
             }
         } else {
@@ -212,6 +213,22 @@ class QrScannerFragment : Fragment(R.layout.fragment_qrscanner) {
         binding.apply {
             groupHasCameraPermission.visibility = View.VISIBLE
             groupNoCameraPermission.visibility = View.GONE
+        }
+    }
+
+    private fun vibratePhone() {
+        //reference:https://stackoverflow.com/questions/47880450/how-to-vibrate-android-device-on-button-click-using-vibrator-effects-using-kotli
+        val vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val vibratorManager = requireContext().getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
+            vibratorManager.defaultVibrator
+        } else {
+            requireContext().getSystemService(VIBRATOR_SERVICE) as Vibrator
+        }
+
+        if (Build.VERSION.SDK_INT >= 26) {
+            vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE))
+        } else {
+            vibrator.vibrate(200)
         }
     }
 
